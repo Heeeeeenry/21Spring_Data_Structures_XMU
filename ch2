@@ -1,0 +1,108 @@
+
+#include<stdio.h>
+#include<stdlib.h>
+
+#define LIST_INIT_SIZE 100
+#define LISTINCREMENT 10
+
+typedef int ElemType;
+typedef int Status;
+
+typedef struct{
+	ElemType *elem;
+	int length;
+	int listsize;
+}SqList;
+
+Status InitList_Sq(SqList &L)
+{
+	L.elem=(ElemType*)malloc(LIST_INIT_SIZE*sizeof(ElemType));
+	if(!L.elem){
+		exit(-1);
+	}
+	L.length=0;
+	L.listsize=LIST_INIT_SIZE;
+	return 0;
+}
+
+//insert element(value==e)@i-th position of the SeqList
+Status ListInsert_Sq(SqList &L,int i,ElemType e)
+{
+	ElemType *p;
+	if(i<1||i>L.length+1){
+		return -1;
+	}
+	if(L.length>=L.listsize){
+		ElemType *newbase = (ElemType*)realloc(L.elem,(L.listsize+LISTINCREMENT)*sizeof(ElemType));
+		if(!newbase){
+			return -1;
+		}
+		L.elem=newbase;
+		L.listsize=L.listsize+LISTINCREMENT;
+	}
+	ElemType *q=&(L.elem[i-1]);
+	for(p=&(L.elem[L.length-1]);p>=q;--p){
+		*(p+1)=*p;
+	}
+	*q=e;
+	++L.length;
+	return 0;
+}
+
+//删除第i个元素（现将a(i+1)到ai依次向上移动，然后将length值减一）
+Status ListDelete_Sq(SqList &L,int i,ElemType &e)
+{
+    ElemType *p,*q;
+    if(i<1||i>L.length){
+        return -1;
+    }
+    p=&(L.elem[i-1]);//被删除元素的位置
+    q=L.elem+L.length-1;//表尾元素的位置
+    for(p=&(L.elem[L.length-1]);p<=q;++p){
+        *(p-1)=*p;
+    }
+    --L.length;
+    return 0;
+}
+
+
+
+//有两个顺序表A和B，其元素均按从小到大的升序排列，编写一个算法将它们合并成一个顺序表C，要求C的元素也是从小到大排列
+#include<stdio.h>
+#include<stdlib.h>
+
+#define LIST_INIT_SIZE 100 //存储空间初始分配量
+#define LISTINCREMENT 10 //存储空间分配增量
+
+typedef int ElemType;
+typedef int Status;
+
+typedef struct{
+	ElemType *elem; //存储空间分配基址
+	int length; //当前的表长
+	int listsize; //当前分配的存储容量
+}SqList;
+
+
+void MergeList_Sq(SqList La,SqList Lb,SqList &Lc)
+{
+    ElemType *pa,*pb,*pc,*pa_last,*pb_last,*pc_last;
+    pa=La.elem;pb=Lb.elem;
+    Lc.listsize=Lc.length=La.length+Lb.length;
+    pc=Lc.elem=(ElemType*)malloc(Lc.listsize*sizeof(ElemType));//分配表Lc的内存
+    if(!Lc.elem)
+        exit(-1);
+    pa_last=La.elem+La.length-1;
+    pb_last=Lb.elem+Lb.length-1;
+    while(pa<=pa_last&&pb<=pb_last){
+        if(*pa<=*pb)
+            *pc++=*pa++;
+        else
+            *pc++=*pb++;
+    }
+    while(pa<=pa_last)
+        *pc++=*pa++;
+    while(pb<=pb_last)
+        *pc++=*pb++;
+}
+
